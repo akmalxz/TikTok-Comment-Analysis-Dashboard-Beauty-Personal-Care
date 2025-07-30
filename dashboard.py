@@ -200,7 +200,7 @@ for i in range(0, len(topic_df_sorted), 2):
                 height=250,
                 background_color='white',
                 max_words=100,
-                colormap='tab20c'
+                colormap='viridis'
             ).generate(text_string)
 
             fig_wc, ax_wc = plt.subplots(figsize=(10, 5), dpi=450)

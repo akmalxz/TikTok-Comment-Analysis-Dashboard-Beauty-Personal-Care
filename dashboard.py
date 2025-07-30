@@ -4,11 +4,15 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import ast
 import seaborn as sns
+import plotly.express as px
+from collections import Counter
 
 # Load data
 sentiment_df = pd.read_csv("sentiment_cleaned.csv")
 topic_df = pd.read_csv("topic_info_gpt_final.csv")
 topic_df = topic_df[topic_df['Topic'] != -1]  # Remove noise topic
+df_revenue = pd.read_csv("final_revenue_dataset.csv")
+df_metadata = pd.read_csv("final_cleaned_tiktok_dataset.csv")
 
 # --- Dashboard Title ---
 st.set_page_config(layout="wide")
@@ -28,8 +32,205 @@ colors = {
         'Mixed': '#91C8E4',
         'Negative': '#DC2525'
     }
-# --- Section 1: Sentiment Overview ---
-st.header("1. Sentiment Overview")
+
+# --- Section 1.1 Revenue Summary ---
+st.header("1. Preliminary Analytics")
+st.subheader("1.1 Revenue Summary")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+        <div style="
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
+        ">
+            <div style="font-size:16px; font-weight:600; color:white;">👥 Total Influencers</div>
+            <div style="font-size:25px; font-weight:700; color:white;">{:,}</div>
+        </div>
+    """.format(len(df_revenue)), unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+        <div style="
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
+        ">
+            <div style="font-size:16px; font-weight:600; color:white;">💰 Avg Revenue (MYR)</div>
+            <div style="font-size:25px; font-weight:700; color:white;">{:,.0f}</div>
+        </div>
+    """.format(df_revenue['Revenue'].mean()), unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+        <div style="
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
+        ">
+            <div style="font-size:16px; font-weight:600; color:white;">📣 Avg Followers</div>
+            <div style="font-size:25px; font-weight:700; color:white;">{:,.0f}</div>
+        </div>
+    """.format(df_revenue['Followers'].mean()), unsafe_allow_html=True)
+
+
+
+# Extract and format the top 10
+df_top10 = df_revenue[['Nickname', 'Revenue', 'RevenuePerFollower', 'RevenuePerVideo', 'RevenuePerLive']] \
+    .sort_values(by='Revenue', ascending=False).head(10)
+
+# Convert to HTML with custom class
+html_top10 = df_top10.to_html(classes='styled-table', index=False, border=0)
+
+# Apply CSS styling
+st.markdown("""
+    <style>
+    .styled-table {
+        font-size: 19px;
+        font-family: "Segoe UI", sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .styled-table thead {
+        background-color: #black;
+        font-weight: bold;
+    }
+    .styled-table td, .styled-table th {
+        padding: 8px 12px;
+        text-align: right;
+        border-bottom: 1px solid #ddd;
+    }
+    .styled-table th {
+        text-align: left;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display the table
+st.markdown(html_top10, unsafe_allow_html=True)
+
+
+col1, col2, col3 = st.columns([1, 3, 1])
+
+with col2:
+    st.markdown("**Revenue Variable Correlations**")
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.heatmap(df_revenue.corr(numeric_only=True), annot=True, cmap='Blues', fmt=".2f", ax=ax)
+    st.pyplot(fig)
+
+# --- Section 1.2 Metadata Summary ---
+st.header("1.2 Metadata Summary (TikTok Videos)")
+
+# --- Summary Stats Table ---
+st.subheader("Summary Statistics")
+
+metadata_summary = df_metadata[[
+    'playCount', 'likesCount', 'commentCount', 'shareCount',
+    'savesCount', 'duration', 'hashtagCount', 'engagement_rate'
+]].describe().T.round(2)
+
+# Format the DataFrame into HTML with styling
+styled_html = metadata_summary.to_html(classes='styled-table', border=0)
+
+# Inject CSS
+st.markdown("""
+    <style>
+    .styled-table {
+        font-size: 19px;
+        font-family: "Segoe UI", sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .styled-table thead {
+        background-color: #black;
+        font-weight: bold;
+    }
+    .styled-table td, .styled-table th {
+        padding: 8px 12px;
+        text-align: right;
+        border-bottom: 1px solid #ddd;
+    }
+    .styled-table th {
+        text-align: left;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown(styled_html, unsafe_allow_html=True)
+
+
+# --- Correlation Heatmap ---
+st.subheader("Correlation Matrix")
+
+col1, col2, col3 = st.columns([1, 3, 1])
+
+with col2:
+    fig_corr, ax_corr = plt.subplots(figsize=(8, 6))
+    sns.heatmap(df_metadata[[
+        'playCount', 'likesCount', 'commentCount', 'shareCount',
+        'savesCount', 'duration', 'hashtagCount', 'engagement_rate'
+    ]].corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax_corr)
+    st.pyplot(fig_corr)
+
+# --- Hashtag Count vs Engagement Rate ---
+st.subheader("Hashtag Count vs Engagement Rate")
+
+hashtag_engagement = df_metadata.groupby("hashtagCount")["engagement_rate"].mean().reset_index()
+
+fig_hashtag = px.bar(
+    hashtag_engagement,
+    x="hashtagCount",
+    y="engagement_rate",
+    title="Average Engagement Rate by Hashtag Count",
+    labels={"hashtagCount": "Hashtag Count", "engagement_rate": "Avg Engagement Rate"},
+    color="engagement_rate",
+    color_continuous_scale="viridis"
+)
+
+# Update layout for better styling
+fig_hashtag.update_layout(
+    title_font_size=18,
+    title_x=0.05,
+    font=dict(size=14),
+    xaxis=dict(
+        title="Hashtag Count",
+        tickfont=dict(size=12),
+        #titlefont=dict(size=14),
+        tickmode="linear"
+    ),
+    yaxis=dict(
+        title="Average Engagement Rate",
+        tickfont=dict(size=12),
+        #titlefont=dict(size=14),
+        tickformat=".2%",  # optional: percentage format
+        gridcolor='rgba(200,200,200,0.2)'
+    ),
+    plot_bgcolor="white",
+    coloraxis_colorbar=dict(
+        title="Engagement Rate",
+        tickformat=".2%"
+    )
+)
+
+# Optional: Custom hover formatting
+fig_hashtag.update_traces(
+    hovertemplate='Hashtags: %{x}<br>Avg Engagement Rate: %{y:.2%}<extra></extra>',
+    marker_line_color='rgba(58, 58, 58, 0.3)',
+    marker_line_width=0.8
+)
+
+st.plotly_chart(fig_hashtag, use_container_width=True)
+
+# --- Section 2: Sentiment Overview ---
+st.header("2. Sentiment Overview")
 
 # Context box for metadata
 with st.expander("📘 About This Section", expanded=True):
@@ -131,7 +332,7 @@ with col2:
 st.markdown("<hr style='border:1px solid #555; margin:30px 0;'>", unsafe_allow_html=True)
 
 # --- Section 2: Topic Modeling Insights ---
-st.header("2. Topic Modeling Insights")
+st.header("3. Topic Modeling Insights")
 
 # Sort topics
 topic_df_sorted = topic_df.sort_values(by='Count', ascending=False).reset_index(drop=True)

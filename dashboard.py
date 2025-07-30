@@ -84,6 +84,9 @@ with col3:
 
 
 # Extract and format the top 10
+df_revenue = df_revenue.copy()  # avoid modifying original if needed elsewhere
+df_revenue['Nickname'] = ['Influencer{:02d}'.format(i+1) for i in range(len(df_revenue))]
+
 df_top10 = df_revenue[['Nickname', 'Revenue', 'RevenuePerFollower', 'RevenuePerVideo', 'RevenuePerLive']] \
     .sort_values(by='Revenue', ascending=False).head(10)
 

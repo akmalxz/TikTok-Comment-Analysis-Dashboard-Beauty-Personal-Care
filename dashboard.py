@@ -8,7 +8,7 @@ import plotly.express as px
 from collections import Counter
 
 # Load data
-sentiment_df = pd.read_csv("sentiment_cleaned.csv")
+sentiment_df = pd.read_csv("sentiment.csv")
 topic_df = pd.read_csv("topic_info_gpt_final.csv")
 topic_df = topic_df[topic_df['Topic'] != -1]  # Remove noise topic
 df_revenue = pd.read_csv("final_revenue_dataset.csv")
@@ -29,7 +29,6 @@ sent_counts = sentiment_df['gpt_label'].value_counts()
 colors = {
         'Positive': '#347433',
         'Neutral': '#D7D7D7',
-        'Mixed': '#91C8E4',
         'Negative': '#DC2525'
     }
 
@@ -259,19 +258,18 @@ st.markdown(
 st.markdown('<div style="font-size:22px; font-weight:600; margin-bottom:6px;">Highlight Sentiment</div>', unsafe_allow_html=True)
 
 # Selectbox with no label
-sentiment_options = ['None (show all equally)', 'Positive', 'Neutral', 'Mixed', 'Negative']
+sentiment_options = ['None (show all equally)', 'Positive', 'Neutral', 'Negative']
 selected_sentiment = st.selectbox(label="", options=sentiment_options, index=0)
 
 
 # Sentiment counts and labels
-labels = ['Positive', 'Neutral', 'Mixed', 'Negative']
+labels = ['Positive', 'Neutral', 'Negative']
 counts = [sent_counts.get(label, 0) for label in labels]
 
 # Define colors and highlight logic
 base_colors = {
     'Positive': '#347433',
     'Neutral': '#E67514',
-    'Mixed': "#91C8E4",
     'Negative': '#DC2525'
 }
 dim_color = '#E0E0E0'  # Light gray for de-emphasis

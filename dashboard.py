@@ -238,7 +238,7 @@ st.header("2. Sentiment Overview")
 with st.expander("📘 About This Section", expanded=True):
     st.markdown("""
     <ul style="font-size:17px; line-height:1.6;">
-        <li><strong>Data Size:</strong> 1,108 unique comments (after deduplication)</li>
+        <li><strong>Data Size:</strong> 2,016 unique comments (after deduplication)</li>
         <li><strong>Sentiment Model:</strong> GPT-4o</li>
         <li><strong>Label Types:</strong> Positive, Neutral, Mixed, Negative</li>
         <li><strong>Comment Source:</strong> TikTok (Beauty & Personal Care, Jan–Aug 2024)</li>
@@ -248,7 +248,7 @@ with st.expander("📘 About This Section", expanded=True):
 # Clarification caption below
 st.markdown(
     '<p style="font-size:17px; color:lightgray;">'
-    'Note: This dashboard analyzes a sample of <strong>1,108 unique comments</strong> after merging identical entries by text and video ID. '
+    'Note: This dashboard analyzes a sample of <strong>2,016 unique comments</strong> after merging identical entries by text and video ID. '
     'The original dataset includes over <strong>34,597 raw comments</strong> collected from top TikTok influencers.'
     '</p>',
     unsafe_allow_html=True

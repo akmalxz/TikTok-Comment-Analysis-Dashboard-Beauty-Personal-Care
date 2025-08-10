@@ -240,7 +240,7 @@ with st.expander("📘 About This Section", expanded=True):
     <ul style="font-size:17px; line-height:1.6;">
         <li><strong>Data Size:</strong> 2,016 unique comments (after deduplication)</li>
         <li><strong>Sentiment Model:</strong> GPT-4o</li>
-        <li><strong>Label Types:</strong> Positive, Neutral, Mixed, Negative</li>
+        <li><strong>Label Types:</strong> Positive, Neutral, Negative</li>
         <li><strong>Comment Source:</strong> TikTok (Beauty & Personal Care, Jan–Aug 2024)</li>
     </ul>
     """, unsafe_allow_html=True)

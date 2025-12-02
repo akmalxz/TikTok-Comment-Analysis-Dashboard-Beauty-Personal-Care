@@ -19,31 +19,40 @@ st.set_page_config(
 # ==========================================
 # 2. CUSTOM CSS (Hard-coded Light Theme)
 # ==========================================
+# ==========================================
+# 2. CUSTOM CSS (Corrected for Contrast)
+# ==========================================
 CUSTOM_CSS = """
 <style>
-/* Force light background + dark text */
-html, body, [class*="css"]  { background-color:#ffffff !important; color:#111111 !important; }
-
-/* Headings */
-h1,h2,h3,h4 { color:#111111; }
-
-/* Card */
-.card {
-  border:1px solid #e6e6e6;
-  border-radius:14px;
-  padding:16px 18px;
-  background:#f9fafb;
-  box-shadow:0 1px 2px rgba(0,0,0,0.04);
+/* 1. Force light background */
+/* We use a specific selector to avoid breaking buttons/inputs that need inverse colors */
+.stApp {
+    background-color: #ffffff !important;
 }
 
-/* KPI */
+/* 2. Global Text Color */
+/* Set body text to dark, but allow buttons/widgets to keep their own styling */
+html, body, p, h1, h2, h3, h4 {
+    color: #111111 !important;
+}
+
+/* 3. Card Styling */
+.card {
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: #f9fafb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+/* 4. KPI Styling */
 .kpi-label { font-size:14px; color:#5f6368; font-weight:600; }
 .kpi-value { font-size:28px; font-weight:800; color:#111111; }
 
-/* Divider */
+/* 5. Divider */
 .hr { border:0; border-top:1px solid #e6e6e6; margin:24px 0; }
 
-/* Tables */
+/* 6. Tables */
 table.styled-table {
   width:100%; border-collapse:collapse; font-family:"Segoe UI", sans-serif;
   font-size:16px; background:#ffffff; color:#111111;
@@ -57,25 +66,31 @@ table.styled-table {
 }
 .styled-table tbody tr:hover { background:#fbfbfc; }
 
-/* Tab Styling */
+/* 7. Tab Styling (FIXED) */
+/* Changed color from white to #31333F (Dark Grey) so it is visible on white bg */
 .stTabs [role="tablist"] button p,
 .stTabs [role="tablist"] button span,
 .stTabs [role="tablist"] button > div[data-testid="stMarkdownContainer"] p {
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  color: white !important;
+  font-size: 18px !important;  /* Reduced slightly for elegance */
+  font-weight: 700 !important;
+  color: #31333F !important;   /* <--- CRITICAL FIX: Dark text */
   margin: 0 !important;
-  line-height: 1.2 !important;
 }
 
-/* Word Table Styling */
+/* Optional: Highlight the selected tab */
+.stTabs [role="tablist"] button[aria-selected="true"] p {
+    color: #C62828 !important; /* Make selected tab Red */
+    border-bottom-color: #C62828 !important;
+}
+
+/* 8. Word Table Styling */
 .word-card { border-radius:10px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.06); margin-top:6px; }
 .word-table { width:100%; border-collapse:collapse; font-size:16px; }
-.word-table th { text-align:left; padding:8px 12px; font-size:17px; }
-.word-table td { padding:6px 12px; font-weight:500; }
-.word-positive { background:#e8f5e9; color:#2E7D32; }
-.word-neutral  { background:#fff3e0; color:#E67514; }
-.word-negative { background:#ffebee; color:#C62828; }
+.word-table th { text-align:left; padding:8px 12px; font-size:17px; color: #111111; }
+.word-table td { padding:6px 12px; font-weight:500; color: #111111; }
+.word-positive { background:#e8f5e9; color:#2E7D32 !important; }
+.word-neutral  { background:#fff3e0; color:#E67514 !important; }
+.word-negative { background:#ffebee; color:#C62828 !important; }
 .word-table tr:nth-child(even) td { filter:brightness(0.98); }
 </style>
 """
